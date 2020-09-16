@@ -1,0 +1,1 @@
+../root/main.sh: line 17: subfinder: command not found
