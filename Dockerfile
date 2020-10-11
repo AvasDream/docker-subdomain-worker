@@ -19,7 +19,7 @@ RUN pip3 install python-telegram-bot --upgrade
 RUN apt-get install amass -y
 # Install subfinder
 RUN git clone https://github.com/projectdiscovery/subfinder.git &&\
-    cd subfinder/cmd/subfinder &&\
+    cd subfinder/v2/cmd/subfinder &&\
     go build . &&\
     mv subfinder /usr/local/bin/ 
 
