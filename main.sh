@@ -36,12 +36,7 @@ function merge-exec {
     cat "$BASE_DIR/tmp.txt" | sort -u > "$BASE_DIR/final.txt"
     l2=$(cat "$BASE_DIR/final.txt" | wc -l)
     notify "All: $l1 - Unique: $l2"
-}
-
-function httpx-exec {
-    httpx -silent -no-color  -threads 64 -l "$BASE_DIR/final.txt" -title -content-length -web-server -status-code -ports 80,81,443,4000,4433,5000,5432,5800,5801,8008,8080,8443,8888 -o "$BASE_DIR/httpx-$DOMAIN.txt"
-    num_domains=$(cat "$BASE_DIR/httpx-$DOMAIN.txt" | wc -l)
-    notify "online - $DOMAIN - $num_domains"
+    echo "All: $l1 - Unique: $l2" > "$BASE_DIR/count.txt"
 }
 
 function parse-live {
@@ -60,9 +55,7 @@ mkdir "$BASE_DIR"
 { time main ; } 2> time.txt
 t=$(cat time.txt | grep real | cut -d " " -f2)
 cp -r $BASE_DIR /data &>> "$BASE_DIR/debug.txt"
-#ls -lah &>> "$BASE_DIR/debug.txt"
 DEBUG_CONTENT=$(cat "$BASE_DIR/debug.txt")
-#notify "Debug: $DEBUG_CONTENT"
 notify "Enum for $DOMAIN in $t"
 
 
