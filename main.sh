@@ -39,16 +39,11 @@ function merge-exec {
     echo "All: $l1 - Unique: $l2" > "$BASE_DIR/count.txt"
 }
 
-function parse-live {
-    cat "$BASE_DIR/httpx-$DOMAIN.txt" | cut -d " " -f1
-}
 function main {
     amass-exec
     subfinder-exec
     aiodns-exec
     merge-exec
-    httpx-exec
-    parse-live
 }
 
 mkdir "$BASE_DIR"
