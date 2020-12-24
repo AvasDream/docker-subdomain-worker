@@ -12,9 +12,8 @@ RUN cd Python-3.8.0 &&\
     ./configure --enable-optimizations &&\
     make &&\
     make altinstall
-# Python dependencies telegram
+# Python pip3
 RUN apt install python3-pip -y
-RUN pip3 install python-telegram-bot --upgrade
 # Install amass
 RUN apt-get install amass -y
 # Install subfinder
@@ -22,21 +21,17 @@ RUN git clone https://github.com/projectdiscovery/subfinder.git &&\
     cd subfinder/v2/cmd/subfinder &&\
     go build . &&\
     mv subfinder /usr/local/bin/ 
-
-
 # Install Aiodnsbrute
 RUN pip3 install aiodnsbrute
 # Create Resolvers file
 RUN echo 8.8.8.8 > /root/dns_resolver.txt
 # Download Subdomain List
 RUN wget https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt -O /root/sublist.txt
-
 # Setup Bash script
 COPY main.sh /root/main.sh
 RUN chmod +x /root/main.sh
-COPY message.py /code/message.py
 COPY aioparse.py /code/aioparse.py
-COPY telegram.token /code/telegram.token
+COPY message.py /code/message.py
 # Create output folder inside the container
 RUN mkdir /data
 ENTRYPOINT [ "../root/main.sh" ]

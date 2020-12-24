@@ -8,10 +8,15 @@ Run:
 
 `docker run -it -v "$(pwd):/data" --rm subs yahoo.com `
 
+## Helper
+
+Count all uniq domains
+` for i in $(ls -d */);do cd $i;cat count.txt | cut -d " " -f5;cd ..;done > sum.txt; cat sum.txt | paste -sd+ | bc`
 
 ## ToDo
 - Wordlist: Jhaddix all.txt fails because of the special chars.
-
+- Telegram optional 
+- Argument Parsing improvment
 
 ## KISS
 
@@ -30,3 +35,8 @@ function httpx-exec {
     notify "online - $DOMAIN - $num_domains"
 }
 ```
+
+## Changelog:
+
+### 336a5f5a0ab1491990a36872ec805930da3bfacd 
+- Notify on global and not container level
