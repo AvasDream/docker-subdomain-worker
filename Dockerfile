@@ -14,6 +14,7 @@ RUN cd Python-3.8.0 &&\
     make altinstall
 # Python pip3
 RUN apt install python3-pip -y
+RUN pip3 install requests
 # Install amass
 RUN apt-get install amass -y
 # Install subfinder
