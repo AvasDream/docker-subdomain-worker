@@ -63,12 +63,13 @@ function httpx-exec {
 
 function altdns-exec {
     echo $DOMAIN >> "$BASE_DIR/subdomains.txt"
-    python3 /altdns/altdns/__main__.py -i "$BASE_DIR/subdomains.txt" -o "$BASE_DIR/altdns-list-$DOMAIN.txt" -w "/code/altdns.txt" -r -s "$BASE_DIR/altdns-$DOMAIN.txt" &> "$BASE_DIR/debug.txt"
+    python3 /altdns/altdns/__main__.py -i "$BASE_DIR/subdomains.txt" -o "$BASE_DIR/altdns-list-$DOMAIN.txt" -w "/code/altdns.txt" &> /dev/null
     echo "[+] Created permutated wordlist for $DOMAIN"
 }
 
-function execute-massdns {
-    /massdns/bin/massdns -r /root/dns_resolver.txt  -o S -t A "$BASE_DIR/massdns-$DOMAIN.txt"
+function massdns-exec {
+    /massdns/bin/massdns -r /root/dns_resolver.txt  -o S -t A -w "$BASE_DIR/massdns-$DOMAIN.txt" "$BASE_DIR/altdns-list-$DOMAIN.txt" #&> "$BASE_DIR/debug.txt"
+    echo "[+] Massdns for $DOMAIN finished"
 }
 
 function clean-files {
@@ -87,7 +88,7 @@ function main {
     crtsh-exec
     merge-exec
     altdns-exec
-    execute-massdns
+    massdns-exec
     #httpx-exec
     #clean-files
 }
