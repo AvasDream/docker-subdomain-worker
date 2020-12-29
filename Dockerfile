@@ -5,7 +5,7 @@ RUN apt install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss
 # Install go 
 RUN apt install -y golang
 RUN go version
-# Install Python
+# Install Python 3.8.0
 RUN curl -O https://www.python.org/ftp/python/3.8.0/Python-3.8.0.tar.xz
 RUN tar -xf Python-3.8.0.tar.xz  
 RUN cd Python-3.8.0 &&\
@@ -28,6 +28,20 @@ RUN pip3 install aiodnsbrute
 RUN echo 8.8.8.8 > /root/dns_resolver.txt
 # Download Subdomain List
 RUN wget https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt -O /root/sublist.txt
+# Install httpx
+RUN GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx
+ENV PATH="/root/go/bin:${PATH}"
+# Install altDNS and as dep python2 :(
+RUN git clone https://github.com/infosec-au/altdns.git &&\
+    cd altdns &&\
+    pip install -r requirements.txt
+COPY altdns.txt /code/altdns.txt
+#Install massdns
+RUN apt-get install libldns-dev -y
+RUN git clone https://github.com/blechschmidt/massdns.git &&\
+    cd massdns &&\
+    make
+#RUN python2.7 /altdns/altdns.py --help
 # Setup Bash script
 COPY main.sh /root/main.sh
 RUN chmod +x /root/main.sh

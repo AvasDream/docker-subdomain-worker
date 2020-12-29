@@ -14,13 +14,19 @@ Count all uniq domains
 ` for i in $(ls -d */);do cd $i;cat count.txt | cut -d " " -f5;cd ..;done > sum.txt; cat sum.txt | paste -sd+ | bc`
 
 ## ToDo
-- Wordlist: Jhaddix all.txt fails because of the special chars.
+- ~~Wordlist: Jhaddix all.txt fails because of the special chars.~~
 - Telegram optional 
 - Argument Parsing improvment
-
+- Add altdns and dns permutations: https://github.com/hpy/permDNS 
+- OneForAll Integration? https://github.com/shmilylty/OneForAll/blob/master/docs/en-us/README.md
+- Wayback subdomains
+- Analytics: 
+    - Comparison tools:
+        - Subdomain overlap and total count
 ## KISS
 
-The check if a domain is live should be in another container.
+~~The check if a domain is live should be in another container.~~
+Check which ports are open. TBD with Portscan.
 
 ```
 # Install httpx
