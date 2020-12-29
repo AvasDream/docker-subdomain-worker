@@ -23,6 +23,12 @@ Count all uniq domains
 - Analytics: 
     - Comparison tools:
         - Subdomain overlap and total count
+
+
+## Note
+
+`curl -s https://www.alexa.com/topsites | grep "<a href=\"/siteinfo"  | cut -d "\"" -f2 | cut -d "/" -f3`
+
 ## KISS
 
 ~~The check if a domain is live should be in another container.~~
