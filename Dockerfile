@@ -28,10 +28,7 @@ RUN pip3 install aiodnsbrute
 RUN echo 8.8.8.8 > /root/dns_resolver.txt
 # Download Subdomain List
 RUN wget https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt -O /root/sublist.txt
-# Install httpx
-RUN GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx
-ENV PATH="/root/go/bin:${PATH}"
-# Install altDNS and as dep python2 :(
+# Install altDNS
 RUN git clone https://github.com/infosec-au/altdns.git &&\
     cd altdns &&\
     pip install -r requirements.txt

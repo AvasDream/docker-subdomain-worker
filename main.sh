@@ -3,7 +3,7 @@
 function display-help {
     echo "Usage:"
     echo "docker run -it --rm -v \"\$(pwd):/data\" subs hackerone.com chat_id secret"
-    echo "Note: Arguments must be supplied in the exact same order as above. This is due to lazy."
+    echo "Note: Arguments must be supplied in the exact same order as above."
     exit 1
 }
 if [ ! $# -eq 3 ]
@@ -45,9 +45,9 @@ function crtsh-exec {
 }
 
 function merge-exec {
-    #cat "$BASE_DIR/aiodns-$DOMAIN.txt" > "$BASE_DIR/tmp.txt"
-    #cat "$BASE_DIR/subfinder-$DOMAIN.txt" >> "$BASE_DIR/tmp.txt"
-    #cat "$BASE_DIR/amass-$DOMAIN.txt" >> "$BASE_DIR/tmp.txt"
+    cat "$BASE_DIR/aiodns-$DOMAIN.txt" > "$BASE_DIR/tmp.txt"
+    cat "$BASE_DIR/subfinder-$DOMAIN.txt" >> "$BASE_DIR/tmp.txt"
+    cat "$BASE_DIR/amass-$DOMAIN.txt" >> "$BASE_DIR/tmp.txt"
     cat "$BASE_DIR/crtsh-$DOMAIN.txt" >> "$BASE_DIR/tmp.txt"
     l1=$(cat "$BASE_DIR/tmp.txt" | wc -l)
     cat "$BASE_DIR/tmp.txt" | tr '[:upper:]' '[:lower:]' | sort -u > "$BASE_DIR/subdomains.txt"
@@ -56,10 +56,6 @@ function merge-exec {
     echo "[+] Merging results for $DOMAIN finished"
 }
 
-function httpx-exec {
-    httpx -silent -no-color -l "$BASE_DIR/subdomains.txt" -timeout 15 -no-color  -vhost -csp-probe -web-server -title -content-length -status-code -follow-redirects -ports 80,443 -threads 32 -o "$BASE_DIR/httpx-$DOMAIN.txt"
-    echo "[+] HTTPX for $DOMAIN finished"
-}
 
 function altdns-exec {
     echo $DOMAIN >> "$BASE_DIR/subdomains.txt"
@@ -67,9 +63,20 @@ function altdns-exec {
     echo "[+] Created permutated wordlist for $DOMAIN"
 }
 
+function merge-altdns {
+    cat "$BASE_DIR/subdomains.txt" >> "$BASE_DIR/merged_subdomains.txt"
+    cat "$BASE_DIR/altdns-list-$DOMAIN.txt" >> "$BASE_DIR/merged_subdomains.txt"
+    echo "[+] Merged recon list with altdns"
+}
+
 function massdns-exec {
-    /massdns/bin/massdns -r /root/dns_resolver.txt  -o S -t A -w "$BASE_DIR/massdns-$DOMAIN.txt" "$BASE_DIR/altdns-list-$DOMAIN.txt" #&> "$BASE_DIR/debug.txt"
+    /massdns/bin/massdns -r /root/dns_resolver.txt  -o S -t A -w "$BASE_DIR/massdns-$DOMAIN.txt" "$BASE_DIR/merged_subdomains.txt" &> /dev/null
     echo "[+] Massdns for $DOMAIN finished"
+}
+
+function format-massdns {
+    cat "$BASE_DIR/massdns-$DOMAIN.txt" | cut -d " " -f1 | sed 's/.$//' >> "$BASE_DIR/resolved_subdomains.txt"
+    echo "[+] Format resolved domains"
 }
 
 function clean-files {
@@ -78,6 +85,10 @@ function clean-files {
     rm -rf "$BASE_DIR/subfinder-$DOMAIN.txt"
     rm -rf "$BASE_DIR/amass-$DOMAIN.txt"
     rm -rf "$BASE_DIR/crtsh-$DOMAIN.txt"
+    rm -rf "$BASE_DIR/altdns-list-$DOMAIN.txt"
+    rm -rf "$BASE_DIR/massdns-$DOMAIN.txt"
+    rm -rf "$BASE_DIR/merged_subdomains.txt"
+    echo "[+] Deleted files"
 }
 
 
@@ -88,18 +99,17 @@ function main {
     crtsh-exec
     merge-exec
     altdns-exec
+    merge-altdns
     massdns-exec
-    #httpx-exec
-    #clean-files
+    format-massdns
 }
 
 mkdir "$BASE_DIR"
 { time main ; } 2> time.txt
 T=$(cat time.txt | grep real | cut -d " " -f2)
-echo "[+] finished in $T"
 NL=$'\n'
-msg="Enum for $DOMAIN finished:$NL$(cat $BASE_DIR/count.txt)$NL$T" #
+msg="Enum for $DOMAIN finished:$NL$(cat $BASE_DIR/count.txt)$NL Subfinder: $(cat $BASE_DIR/subfinder-$DOMAIN.txt | wc -l)$NL Amass: $(cat $BASE_DIR/amass-$DOMAIN.txt | wc -l)$NL Aiodns: $(cat $BASE_DIR/aiodns-$DOMAIN.txt | wc -l)$NL Crtsh: $(cat $BASE_DIR/crtsh-$DOMAIN.txt | wc -l)$NL Subdomain list (input for altdns): $(cat $BASE_DIR/subdomains.txt | wc -l)$NL Altdns list: $(cat $BASE_DIR/altdns-list-$DOMAIN.txt | wc -l)$NL Subdomains resolved: $(cat $BASE_DIR/resolved_subdomains.txt | wc -l)$NL $T" 
 python3 /code/message.py "$msg" &> /dev/null
+clean-files
 cp -r $BASE_DIR /data
-
-
+echo "[+] finished in $T"

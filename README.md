@@ -15,9 +15,9 @@ Count all uniq domains
 
 ## ToDo
 - ~~Wordlist: Jhaddix all.txt fails because of the special chars.~~
-- Telegram optional 
+- ~~Telegram optional ~~
 - Argument Parsing improvment
-- Add altdns and dns permutations: https://github.com/hpy/permDNS 
+- ~~Add altdns and dns permutations: https://github.com/hpy/permDNS ~~
 - OneForAll Integration? https://github.com/shmilylty/OneForAll/blob/master/docs/en-us/README.md
 - Wayback subdomains
 - Analytics: 
@@ -29,9 +29,11 @@ Count all uniq domains
 
 `curl -s https://www.alexa.com/topsites | grep "<a href=\"/siteinfo"  | cut -d "\"" -f2 | cut -d "/" -f3`
 
+Aiodns results are resolved by default are currently resolved again. 
+
 ## KISS
 
-~~The check if a domain is live should be in another container.~~
+HTTPX check is less necessary than the massdns check if a domain is resolvable. Move to other container. 
 Check which ports are open. TBD with Portscan.
 
 ```
