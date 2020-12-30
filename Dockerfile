@@ -42,7 +42,6 @@ RUN git clone https://github.com/blechschmidt/massdns.git &&\
 #Install shuffledns
 RUN GO111MODULE=on go get -v github.com/projectdiscovery/shuffledns/cmd/shuffledns
 ENV PATH="/root/go/bin:${PATH}"
-RUN shuffledns --help
 # Setup Bash script
 COPY main.sh /root/main.sh
 RUN chmod +x /root/main.sh

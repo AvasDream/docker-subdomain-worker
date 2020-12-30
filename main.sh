@@ -141,3 +141,5 @@ python3 /code/message.py "$msg" &> /dev/null
 #clean-files
 cp -r $BASE_DIR /data
 echo "[+] finished in $T"
+
+
