@@ -13,6 +13,9 @@ Run:
 Count all uniq domains
 ` for i in $(ls -d */);do cd $i;cat count.txt | cut -d " " -f5;cd ..;done > sum.txt; cat sum.txt | paste -sd+ | bc`
 
+Get duplicates in two lists
+`sort available-amass.txt available-subfinder.txt | awk 'dup[$0]++ == 1'`
+
 ## ToDo
 - ~~Wordlist: Jhaddix all.txt fails because of the special chars.~~
 - ~~Telegram optional ~~
