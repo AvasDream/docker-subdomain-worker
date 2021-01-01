@@ -98,4 +98,17 @@ function analyse-results {
 
 msg="Enum for $DOMAIN finished:$NL$(cat $BASE_DIR/count.txt)$NL Subfinder: $(cat $BASE_DIR/subfinder-$DOMAIN.txt | wc -l)$NL Amass: $(cat $BASE_DIR/amass-$DOMAIN.txt | wc -l)$NL Aiodns: $(cat $BASE_DIR/aiodns-$DOMAIN.txt | wc -l)$NL Crtsh: $(cat $BASE_DIR/crtsh-$DOMAIN.txt | wc -l)$NL Subdomain list (input for altdns): $(cat $BASE_DIR/subdomains.txt | wc -l)$NL Altdns list: $(cat $BASE_DIR/altdns-list-$DOMAIN.txt | wc -l)$NL Subdomains resolved: $(cat $BASE_DIR/shuffledns-$DOMAIN.txt | wc -l)$NL Analytics $NL $(cat $BASE_DIR/analytics.txt) $NL $T " 
 
+
+
+function merge-altdns {
+    cat "$BASE_DIR/subdomains.txt" >> "$BASE_DIR/merged_subdomains.txt"
+    cat "$BASE_DIR/altdns-list-$DOMAIN.txt" >> "$BASE_DIR/merged_subdomains.txt"
+    echo "[+] Merged recon list with altdns"
+}
+
+function resolve-list {
+    aiodnsbrute -r /root/dns_resolver.txt -w "$BASE_DIR/alternated_subdomains.lst" -t 64 -o json -f "$BASE_DIR/resolved-$DOMAIN.json" $DOMAIN &> /dev/null
+    python3 /code/aioparse.py "$BASE_DIR/resolved-$DOMAIN.json" "$BASE_DIR/resolved-$DOMAIN.txt" &> /dev/null
+    echo "[+] Resolving altdns domain list finished"
+}
 ```

@@ -33,10 +33,9 @@ function subfinder-exec {
 }
 
 function aiodns-exec {
-    aiodnsbrute -r /root/dns_resolver.txt -w /root/sublist.txt -t 64 -o json -f "$BASE_DIR/aiodns-$DOMAIN.json" $DOMAIN &> /dev/null
-    python3 /code/aioparse.py "$BASE_DIR/aiodns-$DOMAIN.json" "$BASE_DIR/aiodns-$DOMAIN.txt" &> /dev/null
-    rm -rf "$BASE_DIR/aiodns-$DOMAIN.json"
-    echo "[+] Aiodns for $DOMAIN finished"
+    aiodnsbrute -r /root/dns_resolver.txt -w $1 -t 64 -o json -f "$BASE_DIR/aiodns-$DOMAIN.json" $DOMAIN &> /dev/null
+    python3 /code/aioparse.py "$BASE_DIR/aiodns-$DOMAIN.json" $2 &> /dev/null
+    echo "[+] Aiodns for wordlist $1 finished"
 }
 
 function crtsh-exec {
@@ -56,22 +55,16 @@ function merge-exec {
     echo "[+] Merging results for $DOMAIN finished"
 }
 
-
 function altdns-exec {
     echo $DOMAIN >> "$BASE_DIR/subdomains.txt"
     python3 /altdns/altdns/__main__.py -i "$BASE_DIR/subdomains.txt" -o "$BASE_DIR/altdns-list-$DOMAIN.txt" -w "/code/altdns.txt" &> /dev/null
     echo "[+] Created permutated wordlist for $DOMAIN"
 }
 
-function merge-altdns {
-    cat "$BASE_DIR/subdomains.txt" >> "$BASE_DIR/merged_subdomains.txt"
-    cat "$BASE_DIR/altdns-list-$DOMAIN.txt" >> "$BASE_DIR/merged_subdomains.txt"
-    echo "[+] Merged recon list with altdns"
-}
-
-function shuffledns-exec {
-    cat "$BASE_DIR/merged_subdomains.txt" | shuffledns -nC -d $DOMAIN -retries 2 -wt 100 -r /root/dns_resolver.txt -o "$BASE_DIR/resolved-$DOMAIN.txt" &> /dev/null
-    echo "[+] Shuffledns for $DOMAIN finished"
+function cut-out-domain {
+    cat "$BASE_DIR/subdomains.txt" | sed "s/.$DOMAIN//" >> "$BASE_DIR/alternated_subdomains.lst"
+    cat "$BASE_DIR/altdns-list-$DOMAIN.txt" | sed "s/.$DOMAIN//" >> "$BASE_DIR/alternated_subdomains.lst"
+    echo "[+] Created List for Aiodns"
 }
 
 function clean-files {
@@ -84,6 +77,7 @@ function clean-files {
     rm -rf "$BASE_DIR/altdns-list-$DOMAIN.txt"
     rm -rf "$BASE_DIR/massdns-$DOMAIN.txt"
     rm -rf "$BASE_DIR/merged_subdomains.txt"
+    rm -rf "$BASE_DIR/resolved-$DOMAIN.json"
     echo "[+] Deleted files"
 }
 
@@ -92,12 +86,12 @@ function clean-files {
 function main {
     amass-exec
     subfinder-exec
-    aiodns-exec
+    aiodns-exec "/root/sublist.txt" "$BASE_DIR/aiodns-$DOMAIN.txt"
     crtsh-exec
     merge-exec
     altdns-exec
-    merge-altdns
-    shuffledns-exec
+    cut-out-domain
+    aiodns-exec "$BASE_DIR/alternated_subdomains.lst" "$BASE_DIR/resolved-$DOMAIN.txt"
 }
 
 mkdir "$BASE_DIR"
@@ -106,7 +100,7 @@ T=$(cat time.txt | grep real | cut -d " " -f2)
 NL=$'\n'
 msg="Enum for $DOMAIN finished:$NL$ Subdomain list (input for altdns): $(cat $BASE_DIR/subdomains.txt | wc -l)$NL Altdns list: $(cat $BASE_DIR/altdns-list-$DOMAIN.txt | wc -l)$NL Subdomains resolved: $(cat $BASE_DIR/resolved-$DOMAIN.txt | wc -l)$NL $T " 
 python3 /code/message.py "$msg" &> /dev/null
-clean-files
+#clean-files
 cp -r $BASE_DIR /data
 echo "[+] finished in $T"
 
