@@ -92,6 +92,7 @@ function main {
     altdns-exec
     cut-out-domain
     aiodns-exec "$BASE_DIR/alternated_subdomains.lst" "$BASE_DIR/resolved-$DOMAIN.txt"
+    rm -rf "$BASE_DIR/altdns-list-$DOMAIN.txt"
 }
 
 mkdir "$BASE_DIR"
