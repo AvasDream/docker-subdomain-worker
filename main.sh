@@ -62,9 +62,9 @@ function altdns-exec {
 }
 
 function cut-out-domain {
-    cat "$BASE_DIR/subdomains.txt" | sed "s/.$DOMAIN//" >> "$BASE_DIR/alternated_subdomains.lst"
-    cat "$BASE_DIR/altdns-list-$DOMAIN.txt" | sed "s/.$DOMAIN//" >> "$BASE_DIR/alternated_subdomains.lst"
-    echo "[+] Created List for Aiodns"
+    cat "$BASE_DIR/subdomains.txt" | sed "s/.$DOMAIN//" >> "$BASE_DIR/alternated_subdomains.txt"
+    cat "$BASE_DIR/altdns-list-$DOMAIN.txt" | sed "s/.$DOMAIN//" >> "$BASE_DIR/alternated_subdomains.txt"
+    echo "[+] Created alternated lists from found subdomains"
 }
 
 function clean-files {
@@ -91,8 +91,7 @@ function main {
     merge-exec
     altdns-exec
     cut-out-domain
-    aiodns-exec "$BASE_DIR/alternated_subdomains.lst" "$BASE_DIR/resolved-$DOMAIN.txt"
-    rm -rf "$BASE_DIR/altdns-list-$DOMAIN.txt"
+    aiodns-exec "$BASE_DIR/alternated_subdomains.txt" "$BASE_DIR/resolved-$DOMAIN.txt"
 }
 
 mkdir "$BASE_DIR"
@@ -102,6 +101,7 @@ NL=$'\n'
 msg="Enum for $DOMAIN finished:$NL$ Subdomain list (input for altdns): $(cat $BASE_DIR/subdomains.txt | wc -l)$NL Altdns list: $(cat $BASE_DIR/altdns-list-$DOMAIN.txt | wc -l)$NL Subdomains resolved: $(cat $BASE_DIR/resolved-$DOMAIN.txt | wc -l)$NL $T " 
 python3 /code/message.py "$msg" &> /dev/null
 #clean-files
+rm -rf "$BASE_DIR/altdns-list-$DOMAIN.txt"
 cp -r $BASE_DIR /data
 echo "[+] finished in $T"
 

@@ -33,8 +33,6 @@ Get duplicates in two lists
 
 `curl -s https://www.alexa.com/topsites | grep "<a href=\"/siteinfo"  | cut -d "\"" -f2 | cut -d "/" -f3`
 
-Aiodns results are resolved by default are currently resolved again. 
-
 ## KISS
 
 HTTPX check is less necessary than the massdns check if a domain is resolvable. Move to other container. 
@@ -52,17 +50,7 @@ function httpx-exec {
     num_domains=$(cat "$BASE_DIR/httpx-$DOMAIN.txt" | wc -l)
     notify "online - $DOMAIN - $num_domains"
 }
-```
 
-## Changelog:
-
-### 336a5f5a0ab1491990a36872ec805930da3bfacd 
-- Notify on global and not container level
-
-
-## Deprecated
-
-```
 function massdns-exec {
     massdns -r /root/dns_resolver.txt  -o S -t A -w "$BASE_DIR/massdns-$DOMAIN.txt" "$BASE_DIR/merged_subdomains.txt" &> /dev/null
     echo "[+] Massdns for $DOMAIN finished"
