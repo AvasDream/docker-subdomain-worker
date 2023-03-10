@@ -1,4 +1,5 @@
 #!/bin/bash
+. /root/.venv/bin/activate
 
 function display-help {
     echo "Usage:"
