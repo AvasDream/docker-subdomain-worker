@@ -5,25 +5,14 @@ RUN apt install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss
 # Install go 
 RUN apt install -y golang
 RUN go version
-# Install Python 3.8.0
-RUN curl -O https://www.python.org/ftp/python/3.8.0/Python-3.8.0.tar.xz
-RUN tar -xf Python-3.8.0.tar.xz  
-RUN cd Python-3.8.0 &&\
-    ./configure --enable-optimizations &&\
-    make &&\
-    make altinstall
-# Python pip3
-RUN apt install python3-pip -y
-RUN pip3 install requests
+# Install Python requirements
+RUN apt install python3-pip python3-venv -y
+RUN python3 -m venv /root/.venv
+RUN /root/.venv/bin/pip3 install requests aiodnsbrute
 # Install amass
 RUN apt-get install amass -y
 # Install subfinder
-RUN git clone https://github.com/projectdiscovery/subfinder.git &&\
-    cd subfinder/v2/cmd/subfinder &&\
-    go build . &&\
-    mv subfinder /usr/local/bin/ 
-# Install Aiodnsbrute
-RUN pip3 install aiodnsbrute
+RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 # Create Resolvers file
 RUN echo 8.8.8.8 > /root/dns_resolver.txt
 # Download Subdomain List
@@ -40,7 +29,7 @@ RUN git clone https://github.com/blechschmidt/massdns.git &&\
     make &&\
     mv /massdns/bin/massdns /usr/bin/massdns
 #Install shuffledns
-RUN GO111MODULE=on go get -v github.com/projectdiscovery/shuffledns/cmd/shuffledns
+RUN go install -v github.com/projectdiscovery/shuffledns/cmd/shuffledns@latest
 ENV PATH="/root/go/bin:${PATH}"
 # Setup Bash script
 COPY main.sh /root/main.sh
