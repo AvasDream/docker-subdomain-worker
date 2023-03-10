@@ -6,16 +6,13 @@ function display-help {
     echo "Note: Arguments must be supplied in the exact same order as above."
     exit 1
 }
-if [ ! $# -eq 3 ]
+
+if [[ ! ($# -eq 1 || $# -eq 3 ) ]]
 then 
     display-help
 fi
 
 DOMAIN="$1"
-CHAT_ID="$2"
-echo "$CHAT_ID" > /code/chat.id
-SECRET_TOKEN="$3"
-echo "$SECRET_TOKEN" > /code/telegram.token
 DATE=$(date +%d.%m.%y-%H:%M)
 BASE_DIR="/root/$DOMAIN-$DATE"
 TOOLS_DIR='/root/tools'
@@ -99,10 +96,17 @@ mkdir "$BASE_DIR"
 T=$(cat time.txt | grep real | cut -d " " -f2)
 NL=$'\n'
 msg="Enum for $DOMAIN finished:$NL$ Subdomain list (input for altdns): $(cat $BASE_DIR/subdomains.txt | wc -l)$NL Altdns list: $(cat $BASE_DIR/altdns-list-$DOMAIN.txt | wc -l)$NL Subdomains resolved: $(cat $BASE_DIR/resolved-$DOMAIN.txt | wc -l)$NL $T " 
+
+if [[ $# -eq 3 ]]
+then
+CHAT_ID="$2"
+SECRET_TOKEN="$3"
+echo "$CHAT_ID" > /code/chat.id
+echo "$SECRET_TOKEN" > /code/telegram.token
 python3 /code/message.py "$msg" &> /dev/null
+fi
+
 #clean-files
 rm -rf "$BASE_DIR/altdns-list-$DOMAIN.txt"
 cp -r $BASE_DIR /data
 echo "[+] finished in $T"
-
-
